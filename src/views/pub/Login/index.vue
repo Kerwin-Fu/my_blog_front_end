@@ -2,7 +2,11 @@
 import { reactive, ref } from 'vue'
 import { User, Lock, Key } from '@element-plus/icons-vue'
 import { useCaptcha } from '@/hooks/use-captcha'
+import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 
+const store = useStore()
+const router = useRouter()
 // 状态：表单数据
 const formData = reactive({
   username: '',
@@ -37,6 +41,18 @@ const loginForm = ref<any>(null)
 // 事件：点击登录按钮
 const loginHandler = async () => {
   // TODO：登录逻辑
+  try {
+    await loginForm.value.validate()
+    await store.dispatch('login', {
+      ...formData,
+      captchaKey: captchaData.captchaKey
+    })
+    
+    router.replace('/my/articles')
+  } catch (e) {
+    console.log(e)
+    refreshCaptcha()
+  }
 }
 
 refreshCaptcha()

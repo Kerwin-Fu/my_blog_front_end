@@ -1,11 +1,16 @@
+<script lang="ts" setup>
+import AppHeader from '../components/AppHeader.vue'
+import MySideMenu from "../components/MySideMenu.vue";
+</script>
+
 <template>
   <el-container>
     <!-- 顶部栏 -->
-    <el-header class="fixed-header"> 页头 </el-header>
+    <el-header class="fixed-header"> <app-header /> </el-header>
 
     <el-container>
       <!-- 左边侧栏 -->
-      <el-aside width="340px"> 边栏 </el-aside>
+      <el-aside width="340px"> <my-side-menu /> </el-aside>
 
       <!-- 右边主体 -->
       <el-main>

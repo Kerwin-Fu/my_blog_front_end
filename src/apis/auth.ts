@@ -11,3 +11,12 @@ export function register(data: {
 export function captcha() {
   return get<{ key: string, svg: string }>('/api/captcha')
 }
+
+export function login(data: {
+  username: string;
+  password: string;
+  captchaKey: string;
+  captchaCode: string;
+}) {
+  return post<string>('/api/login', data)
+}

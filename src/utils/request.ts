@@ -1,3 +1,4 @@
+import router from '@/router'
 import axios, { AxiosRequestConfig } from 'axios'
 import { ElMessage } from 'element-plus'
 import store from '../store'
@@ -24,6 +25,11 @@ http.interceptors.response.use(response => {
   const data = response.data
 
   ElMessage.error(`${data.message} (错误代码：${data.code})`)
+
+  if (response.status === 401) {
+    store.dispatch('clearLogin')
+    return router.replace('/sign/login')
+  }
 
   return Promise.reject(error)
 })

@@ -1,7 +1,11 @@
+<script lang="ts" setup>
+import AppHeader from '../components/AppHeader.vue'
+</script>
+
 <template>
   <el-container>
     <!-- 顶部栏 -->
-    <el-header class="fixed-header"> 页头 </el-header>
+    <el-header class="fixed-header"> <app-header /> </el-header>
 
     <!-- 主体 -->
     <el-main>
