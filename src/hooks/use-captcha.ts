@@ -9,9 +9,9 @@ export function useCaptcha() {
 
   const refreshCaptcha = async () => {
     try {
-      const { key, svg } = await captcha()
-      captchaData.captchaKey = key
-      captchaData.captchaImage = svg
+      const { data:res } = await captcha()
+      captchaData.captchaKey = res.data.key
+      captchaData.captchaImage = res.data.svg
     } catch (e) {
       console.log(e)
     }

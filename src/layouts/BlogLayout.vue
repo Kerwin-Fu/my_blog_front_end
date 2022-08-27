@@ -5,7 +5,7 @@ import AppHeader from '../components/AppHeader.vue'
 <template>
   <el-container>
     <!-- 顶部栏 -->
-    <el-header class="fixed-header"> <app-header /> </el-header>
+    <el-header class="fixed-header"> <AppHeader /> </el-header>
 
     <!-- 主体 -->
     <el-main>

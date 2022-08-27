@@ -31,13 +31,14 @@ const store = createStore({
   },
   actions: {
     async login({ commit }, loginParams) {
-      const token = await login(loginParams)
-      commit('setToken', token)
+      const {data:res} = await login(loginParams)
+      commit('setToken', res.data)
     },
 
     async getUserInfo({ commit }) {
-      const profile = await getUserProfile()
-      commit('setUserInfo', profile)
+      const {data:res} = await getUserProfile()
+      
+      commit('setUserInfo', res.data)
     },
 
     async clearLogin({ commit }) {

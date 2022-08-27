@@ -46,21 +46,21 @@ export interface ApiResult<T = any> {
 export function get<T = any>(url: string, config?: AxiosRequestConfig | undefined) {
   const promise = http.get<ApiResult<T>>(url, config)
 
-  return promise.then(res => res.data.data)
+  return promise.then(res => res)
 }
 
 
 export function del<T = any>(url: string, config?: AxiosRequestConfig | undefined) {
   const promise = http.delete<ApiResult<T>>(url, config)
-  return promise.then(res => res.data.data)
+  return promise.then(res => res)
 }
 
 export function post<T = any>(url: string, data?: any, config?: AxiosRequestConfig | undefined) {
   const promise = http.post<ApiResult<T>>(url, data, config)
-  return promise.then(res => res.data.data)
+  return promise.then(res => res)
 }
 
 export function put<T = any>(url: string, data?: any, config?: AxiosRequestConfig | undefined) {
   const promise = http.put<ApiResult<T>>(url, data, config)
-  return promise.then(res => res.data.data)
+  return promise.then(res => res)
 }

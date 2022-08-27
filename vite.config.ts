@@ -9,6 +9,12 @@ export default defineConfig({
       { find: '@', replacement: resolve(__dirname, 'src') }
     ]
   },
+  server: {
+    host: 'localhost',
+    cors: true,
+    open: true,
+    hmr: true,
+  },
 
   plugins: [vue()]
 })
