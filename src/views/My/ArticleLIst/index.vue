@@ -37,7 +37,7 @@
       </el-form>
 
       <div class="tool-buttons">
-        <el-button plain type="success">
+        <el-button plain type="success" @click="createHandler">
           <el-icon><plus></plus></el-icon>
           创建文章
         </el-button>
@@ -80,6 +80,13 @@
       v-model:currentPage="listParams.pageNo"
     >
     </el-pagination>
+
+    <create-or-update-form
+      v-model:visible="dialogVisible"
+      :article="dialogFormData"
+      :categories="categories"
+
+    />
   </div>
 </template>
 
@@ -89,6 +96,7 @@ import { formatDate } from '@/utils/format'
 import { Search, Edit, Files, Plus, Delete } from '@element-plus/icons-vue'
 import { listArticles } from '@/apis/articles'
 import { listCategories } from '@/apis/category'
+import CreateOrUpdateForm from './components/CreateOrUpdateForm.vue'
 
 const listData = reactive({
   total: 0,
@@ -103,10 +111,29 @@ const listParams = reactive({
   pageSize: 5
 })
 
+
+// 添加编辑/新文章弹出框
+const dialogVisible = ref<boolean>(false)
+const dialogFormData = reactive({
+  _id: '',
+  title: '',
+  summary: '',
+  content: '',
+  categoryId: ''
+})
+
+// 搜索按钮
 const searchHandler = () => {
   ;(listParams.pageNo = 1), getCategoryList()
 }
 
+// 创建文章按钮
+const createHandler = () => {
+  dialogVisible.value = true
+}
+
+//  🌟🌟🌟🌟🌟🌟 接口👇 🌟🌟🌟🌟🌟🌟🌟
+// 获取文章列表
 const getCategoryList = async () => {
   try {
     const { data: res } = await listArticles(listParams)
@@ -116,7 +143,7 @@ const getCategoryList = async () => {
     console.log(e)
   }
 }
-
+// 获取分类信息
 const getCategories = async () => {
   try {
     const { data: res } = await listCategories()
@@ -125,6 +152,8 @@ const getCategories = async () => {
     console.log(e)
   }
 }
+//  🌟🌟🌟🌟🌟🌟 接口👆 🌟🌟🌟🌟🌟🌟🌟
+
 getCategories()
 watch(
   [() => listParams.pageNo, () => listParams.pageSize],
