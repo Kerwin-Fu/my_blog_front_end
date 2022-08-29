@@ -4,7 +4,7 @@
     v-model="dialogStatus.isVisible"
     center
     fullscreen
-    :title="'新增文章'"
+    :title="dialogStatus.isEdit ? '修改文章' : '新增文章'"
     :show-close="false"
     :before-close="cancelHandler"
   >
@@ -46,18 +46,20 @@
         ></el-input>
       </el-form-item>
 
-      <el-form-item label="文章正文" prop="content">
+      <el-form-item label="文章正文" prop="content" class="edit-main">
         <editor
           api-key="xvwbijcyq6aimr3uutqz5f3xtcrqm6muotg2h9ikis0wujy0"
           v-model="formData.content"
+          tinymce-script-src="/tinymce/tinymce.min.js"
           :init="{
             selector: 'textarea',
             height: 500,
             menubar: false,
             branding: false,
-            plugins: 'lists link image help wordcount advlist autolink charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table paste code wordcount',
+            plugins:
+              'lists link image help wordcount advlist autolink charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table paste code wordcount',
             toolbar:
-              'undo redo | formatselect | forecolor bold italic |backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | fullscreen'
+              'undo redo | formatselect forecolor bold italic |backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | fullscreen'
           }"
         />
       </el-form-item>
@@ -67,15 +69,16 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button type="default" @click="cancelHandler"> 取 消 </el-button>
-        <el-button type="primary"> 确 定 </el-button>
+        <el-button type="primary" @click="submitHander"> 确 定 </el-button>
       </span>
     </template>
   </el-dialog>
 </template>
 
 <script lang="ts" setup>
-import { defineComponent, watch, reactive, PropType } from 'vue'
+import { defineComponent, watch, reactive, PropType,ref } from 'vue'
 import Editor from '@tinymce/tinymce-vue'
+import { createArticle, updateArticle } from '@/apis/articles';
 defineComponent({
   name: 'CreateOrUpdateForm'
 })
@@ -86,6 +89,7 @@ interface Category {
   _id: string
 }
 
+const emit = defineEmits(['update:visible', 'complete'])
 const props = defineProps({
   categories: {
     type: Array as PropType<Category[]>,
@@ -101,6 +105,10 @@ const props = defineProps({
   }
 })
 
+// 弹出框表单的 ref 绑定
+const dialogForm = ref<any>(null)
+
+// 弹出框的内容
 const formData = reactive({
   _id: '',
   title: '',
@@ -109,6 +117,7 @@ const formData = reactive({
   categoryId: ''
 })
 
+// 表单校验
 const formRules = {
   title: {
     required: true,
@@ -122,21 +131,39 @@ const formRules = {
   }
 }
 
+// 弹出框的状态
 const dialogStatus = reactive({
   isVisible: false,
   isEdit: false
 })
 
-const emit = defineEmits(['update:visible'])
-
+// 取消操作文章
 const cancelHandler = () => {
   dialogStatus.isVisible = false
   emit('update:visible', false)
 }
 
+// 提交文章按钮
+const submitHander = async() => {
+  await dialogForm.value.validate()
+  if (dialogStatus.isEdit) {
+    await updateArticle(formData)
+  } else {
+    await createArticle(formData)
+  }
+  emit('complete', dialogStatus.isEdit)
+  cancelHandler()
+}
+
+
 watch([() => props.visible, props.article], (newVals) => {
   const [visible, article] = newVals
-  ;(dialogStatus.isVisible = !!visible), (dialogStatus.isEdit = !!article!._id)
+  ;(dialogStatus.isVisible = !!visible), (dialogStatus.isEdit = !!article?._id)
+  formData._id = article?._id
+  formData.title = article?.title
+  formData.summary = article?.summary
+  formData.content = article?.content
+  formData.categoryId = article?.categoryId
 })
 </script>
 
@@ -145,7 +172,10 @@ watch([() => props.visible, props.article], (newVals) => {
   width: 960px;
   margin: 0 auto;
 }
+</style>
+
+<style>
 .tox-tinymce-aux {
-  z-index: 9999999;
+  z-index: 9999999 !important;
 }
 </style>

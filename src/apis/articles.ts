@@ -16,7 +16,7 @@ export function createArticle(data: {
   title: string,
   summary: string,
   content: string,
-  catrgoryId: string
+  categoryId: string
 }) {
   return post<boolean>('/api/user/articles', data)
 }
@@ -26,7 +26,7 @@ export function updateArticle(data: {
   title: string,
   summary: string,
   content: string,
-  catrgoryId: string
+  categoryId: string
 }) {
   return put<boolean>(`/api/user/articles/${data._id}`, data)
 }

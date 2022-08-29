@@ -61,7 +61,7 @@
       </el-table-column>
       <el-table-column label="操作" width="200" align="center">
         <template #default="scope">
-          <el-button type="text">
+          <el-button type="text" @click="editHandler(scope.row)">
             <el-icon><edit></edit></el-icon>
             编辑
           </el-button>
@@ -85,7 +85,7 @@
       v-model:visible="dialogVisible"
       :article="dialogFormData"
       :categories="categories"
-
+      @complete="completeHandler"
     />
   </div>
 </template>
@@ -94,7 +94,7 @@
 import { reactive, watch, ref } from 'vue'
 import { formatDate } from '@/utils/format'
 import { Search, Edit, Files, Plus, Delete } from '@element-plus/icons-vue'
-import { listArticles } from '@/apis/articles'
+import { getArticle, listArticles } from '@/apis/articles'
 import { listCategories } from '@/apis/category'
 import CreateOrUpdateForm from './components/CreateOrUpdateForm.vue'
 
@@ -102,8 +102,9 @@ const listData = reactive({
   total: 0,
   items: [] as any[]
 })
+// 文章分类数组
 const categories = ref<any[]>([])
-
+// 搜索参数
 const listParams = reactive({
   categoryId: '',
   keyword: '',
@@ -111,9 +112,9 @@ const listParams = reactive({
   pageSize: 5
 })
 
-
 // 添加编辑/新文章弹出框
 const dialogVisible = ref<boolean>(false)
+  // 文章回显详情
 const dialogFormData = reactive({
   _id: '',
   title: '',
@@ -129,7 +130,33 @@ const searchHandler = () => {
 
 // 创建文章按钮
 const createHandler = () => {
+  ;(dialogFormData._id = ''),
+    (dialogFormData.categoryId = ''),
+    (dialogFormData.content = ''),
+    (dialogFormData.summary = ''),
+    (dialogFormData.title = '')
   dialogVisible.value = true
+}
+
+// 编辑文章按钮
+const editHandler = async (row: any) => {
+  const { data: res } = await getArticle(row._id)
+
+  dialogFormData._id = row._id
+  dialogFormData.title = res.data.title
+  dialogFormData.summary = res.data.summary
+  dialogFormData.content = res.data.content
+  dialogFormData.categoryId = res.data.categoryId
+
+  dialogVisible.value = true
+}
+
+// 弹出框完成
+const completeHandler = (isEdit: boolean) => {
+  if (!isEdit) {
+    listParams.pageNo = 1
+  }
+  getCategoryList()
 }
 
 //  🌟🌟🌟🌟🌟🌟 接口👇 🌟🌟🌟🌟🌟🌟🌟
