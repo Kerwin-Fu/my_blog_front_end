@@ -51,16 +51,7 @@
           api-key="xvwbijcyq6aimr3uutqz5f3xtcrqm6muotg2h9ikis0wujy0"
           v-model="formData.content"
           tinymce-script-src="/tinymce/tinymce.min.js"
-          :init="{
-            selector: 'textarea',
-            height: 500,
-            menubar: false,
-            branding: false,
-            plugins:
-              'lists link image help wordcount advlist autolink charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table paste code wordcount',
-            toolbar:
-              'undo redo | formatselect forecolor bold italic |backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | fullscreen'
-          }"
+          :init="editorOptions"
         />
       </el-form-item>
     </el-form>
@@ -76,9 +67,11 @@
 </template>
 
 <script lang="ts" setup>
-import { defineComponent, watch, reactive, PropType,ref } from 'vue'
+import { defineComponent, watch, reactive, PropType, ref } from 'vue'
 import Editor from '@tinymce/tinymce-vue'
-import { createArticle, updateArticle } from '@/apis/articles';
+import { createArticle, updateArticle } from '@/apis/articles'
+import { baseURL } from '@/utils/request'
+import { uploadImage } from '@/apis/upload'
 defineComponent({
   name: 'CreateOrUpdateForm'
 })
@@ -131,6 +124,49 @@ const formRules = {
   }
 }
 
+// 状态：富⽂本编辑器 TinyMCE 的配置
+const editorOptions = reactive({
+  // 编辑器⾼度
+  height: 500,
+  // 不显⽰顶部菜单栏
+  menubar: false,
+  // 不显⽰底部 TinyMCE 的版权⽂字
+  branding: false,
+  // 界⾯使⽤的⽪肤⽂件路径
+  skin_url: '/tinymce/skins/ui/oxide',
+  // 启⽤的插件
+  plugins: [
+    'advlist autolink lists link image charmap print preview anchor',
+    'searchreplace visualblocks code fullscreen',
+    'insertdatetime media table paste code image wordcount'
+  ],
+  // 启⽤的⼯具栏按钮
+  toolbar: [
+    'undo redo | formatselect | forecolor bold italic backcolor | ',
+    'alignleft aligncenter alignright alignjustify | ',
+    'bullist numlist outdent indent | ',
+    'removeformat | image fullscreen'
+  ].join(''),
+  // 编辑器初始显⽰内容
+  contentValue: formData.content,
+
+  images_upload_handler: async (blobInfo: any, success: any, failure: any) => {
+    try {
+      // 获取要上传的文件，拼装成 FormData 格式的表单数据
+      console.log(blobInfo)
+      const fd = new FormData()
+      fd.append('file', blobInfo.blob(), blobInfo.filename())
+
+      // 调用接口，执行文件上传
+      const {data:res} = await uploadImage(fd)
+
+      // 将后端返回的上传后的图片路径（相对路径），拼接成完整路径
+      // 然后调用 success 回调函数来通知 TinyMCE 编辑器该图片路径
+      success(baseURL + res.data.location)
+    } catch (e) {}
+  }
+})
+
 // 弹出框的状态
 const dialogStatus = reactive({
   isVisible: false,
@@ -144,7 +180,7 @@ const cancelHandler = () => {
 }
 
 // 提交文章按钮
-const submitHander = async() => {
+const submitHander = async () => {
   await dialogForm.value.validate()
   if (dialogStatus.isEdit) {
     await updateArticle(formData)
@@ -154,7 +190,6 @@ const submitHander = async() => {
   emit('complete', dialogStatus.isEdit)
   cancelHandler()
 }
-
 
 watch([() => props.visible, props.article], (newVals) => {
   const [visible, article] = newVals
