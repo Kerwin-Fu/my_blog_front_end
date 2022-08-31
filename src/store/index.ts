@@ -1,6 +1,6 @@
 import { createStore, Store } from "vuex";
 import { login } from '../apis/auth'
-import { getUserProfile } from '../apis/profiles'
+import { getUserProfile, updateAvatar, updateBaseInfo, updatePassword } from '../apis/profiles'
 
 const store = createStore({
   state: {
@@ -31,19 +31,39 @@ const store = createStore({
   },
   actions: {
     async login({ commit }, loginParams) {
-      const {data:res} = await login(loginParams)
+      const { data: res } = await login(loginParams)
       commit('setToken', res.data)
     },
 
     async getUserInfo({ commit }) {
-      const {data:res} = await getUserProfile()
-      
+      const { data: res } = await getUserProfile()
+
       commit('setUserInfo', res.data)
     },
 
     async clearLogin({ commit }) {
       commit('setToken', '')
       commit('setUserInfo', {})
+    },
+
+    async updateProfileAvatar(store, avatar) {
+      await updateAvatar(avatar)
+      store.commit('setUserInfo', {
+        ...store.state.userInfo,
+        avatar
+      })
+    },
+
+    async updateProfileBaseInfo(store, params) {
+      await updateBaseInfo(params)
+      store.commit('setUserInfo', {
+        ...store.state.userInfo,
+        ...params
+      })
+    },
+
+    async updateProfilePassword(store, params) {
+      await updatePassword(params)
     }
   }
 })

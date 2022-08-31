@@ -72,6 +72,7 @@ import Editor from '@tinymce/tinymce-vue'
 import { createArticle, updateArticle } from '@/apis/articles'
 import { baseURL } from '@/utils/request'
 import { uploadImage } from '@/apis/upload'
+import { ElMessageBox } from 'element-plus'
 defineComponent({
   name: 'CreateOrUpdateForm'
 })

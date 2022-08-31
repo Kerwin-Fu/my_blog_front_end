@@ -32,19 +32,23 @@ const commandHandler = (command: string) => {
       </router-link>
 
       <!-- 未登录时显示的内容 -->
-      <div class="logininfo">
+      <div class="logininfo" v-if="!profile._id">
         <router-link to="/sign/login">登录</router-link>
         <b>·</b>
         <router-link to="/sign/register">注册</router-link>
       </div>
 
       <!-- 已登录时显示的内容 -->
-      <div class="userinfo">
+      <div class="userinfo" v-else>
         <span></span>
-        <el-dropdown>
+        <el-dropdown @command="commandHandler">
           <span class="el-dropdown-link">
             <div class="avatar">
-              <img class="avatar-img" alt="" />
+              <img
+                class="avatar-img"
+                alt=""
+                :src="getAvatarImage(profile.avatar)"
+              />
             </div>
             <i class="el-icon-caret-bottom el-icon--right"></i>
           </span>

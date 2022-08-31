@@ -66,7 +66,7 @@
             编辑
           </el-button>
 
-          <el-button type="text"> 删除 </el-button>
+          <el-button type="text" @click="removeHandler(scope.row)"> 删除 </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -94,9 +94,10 @@
 import { reactive, watch, ref } from 'vue'
 import { formatDate } from '@/utils/format'
 import { Search, Edit, Files, Plus, Delete } from '@element-plus/icons-vue'
-import { getArticle, listArticles } from '@/apis/articles'
+import { getArticle, listArticles, removeArticle } from '@/apis/articles'
 import { listCategories } from '@/apis/category'
 import CreateOrUpdateForm from './components/CreateOrUpdateForm.vue'
+import { ElMessageBox } from 'element-plus'
 
 const listData = reactive({
   total: 0,
@@ -114,7 +115,7 @@ const listParams = reactive({
 
 // 添加编辑/新文章弹出框
 const dialogVisible = ref<boolean>(false)
-  // 文章回显详情
+// 文章回显详情
 const dialogFormData = reactive({
   _id: '',
   title: '',
@@ -157,6 +158,15 @@ const completeHandler = (isEdit: boolean) => {
     listParams.pageNo = 1
   }
   getCategoryList()
+}
+
+// 点击删除按钮
+const removeHandler = async (row: any) => {
+  try {
+    await ElMessageBox.confirm('确认要删除这篇文章吗?', '提示')
+    await removeArticle(row._id)
+    await getCategoryList()
+  } catch (e) {}
 }
 
 //  🌟🌟🌟🌟🌟🌟 接口👇 🌟🌟🌟🌟🌟🌟🌟

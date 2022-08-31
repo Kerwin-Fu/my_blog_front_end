@@ -34,3 +34,7 @@ export function updateArticle(data: {
 export function getArticle(id: string) {
   return get(`/api/user/articles/${id}`)
 }
+
+export function removeArticle(id: string) {
+  return del<boolean>(`/api/user/articles/${id}`)
+}
